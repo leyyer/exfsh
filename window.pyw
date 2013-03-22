@@ -8,10 +8,11 @@ from ScrolledText import ScrolledText
 class Widget(Frame):
     def __init__(self, master):
         self.builtins = {
-                       'ls': fs_ls,
-                       'copy': fs_copy,
-                       'help': self.__help,
-                       'clear': self.__clear
+					'cat': fs_cat,
+                    'ls': fs_ls,
+                    'cp': fs_copy,
+                    'help': self.__help,
+                    'clear': self.__clear
             }
         self.disk = None
         self.parts = []
@@ -65,7 +66,7 @@ class Widget(Frame):
         self.cmdline.delete(0, END)
 #        if not self.extfs: return
         cmds = cmd.split()
-        args = "".join(cmds[1:])
+        args = " ".join(cmds[1:])
         try:
             f = self.builtins[cmds[0]]
             s = f(self.extfs, args)

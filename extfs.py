@@ -115,16 +115,16 @@ class FileEntry(FileEntryType):
         low = self.blksize * 12
         hi = self.blksize * (self.blksize / 4) + low
         blk = []
-        if self._cur_pos >= low and self.cur_pos < hi:
+        if self._cur_pos >= low and self._cur_pos < hi:
             if self.inode.i_block[12] == 0:
                 return blk
-            block13 = self.filesys.read_block(self.inode.i_block[12])
+            block13 = buffer(bytearray(self.filesys.read_block(self.inode.i_block[12])))
             fmt = "<%dI" % (self.blksize / 4)
             block13 = struct.unpack(fmt, block13)
             cpos = self._cur_pos - low
             n = cpos / self.blksize
             r = cpos % self.blksize
-            blk = self._doread(block13[n:], r, size)
+            blk = self._do_read(block13[n:], r, size)
         return blk
     def __read_block14(self, size):
         low = self.blksize * (self.blksize / 4) + self.blksize * 12
@@ -137,9 +137,10 @@ class FileEntry(FileEntryType):
             nblock = cpos / self.blksize
             n1 = nblock / (self.blksize / 4)
             n0 = n1 / (self.blksize / 4)
-            block14 = self.filesys.read_block(self.inode.i_block[13])
+            block14 = buffer(bytearry(self.filesys.read_block(self.inode.i_block[13])))
             fmt = "<%dI" % (self.blksize / 4)
-            block14 = struct.unpack(fmt, block14)
+
+            block14 = struct.unpack_from(fmt, block14)
             r0 = cpos % self.blksize
             for x in block14[n0:]:
                 assert(x > 0)
@@ -167,12 +168,12 @@ class FileEntry(FileEntryType):
             n1 = n2 / ndx
             n0 = n1 / ndx
             fmt = "<%dI" % ndx
-            b15 = struct.unpack(fmt, self.filesys.read_block(self.inode.i_block[14]))
+            b15 = struct.unpack_from(fmt, buffer(bytearray(self.filesys.read_block(self.inode.i_block[14]))))
             for x in b15[n0:]:
                 assert(x > 0)
-                c15 = struct.unpack(fmt, self.filesys.read_block(x))
+                c15 = struct.unpack_from(fmt, buffer(bytearray(self.filesys.read_block(x))))
                 for y in c15[n1:]:
-                    d15 = struct.unpack(fmt, self.filesys.read_block(y))
+                    d15 = struct.unpack_from(fmt, buffer(bytearray(self.filesys.read_block(y))))
                     bk = self._do_read(d15[n2:], r, size)
                     r = 0
                     n2 = 0
